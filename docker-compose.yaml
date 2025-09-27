@@ -1,0 +1,34 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev      # Указываем стадию 'dev'
+    volumes:
+      - ./app:/app     # Монтируем код в контейнер
+    ports:
+      - "8087:8080"    # Пример: пробрасываем порт приложения http://localhost:8087
+    environment:       # Переменные для подключения к БД
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=golang
+      - DB_PASSWORD=goland
+      - DB_NAME=goland
+    # Опционально: файл с переменными окружения
+    # env_file:
+    #   - dev.env
+    restart: unless-stopped
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=golang
+      - POSTGRES_PASSWORD=goland
+      - POSTGRES_DB=goland
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    restart: unless-stopped
